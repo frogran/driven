@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+</head>
+<body style="background-color: white; text-align: center; margin-top: 20%; font-family: Arial, sans-serif;">
+    <h1>Text Submissions</h1>
+    <ul style="text-align: left; margin: 0 auto; width: 50%; list-style-type: none; padding: 0;">
+        {% for submission in submissions %}
+            <li style="font-size: 18px; margin-bottom: 10px;">{{ submission }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
