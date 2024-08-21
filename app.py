@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
+import threading
+import time
 
 app = Flask(__name__)
 
@@ -22,6 +24,21 @@ def crowd():
 def admin():
     return render_template('admin.html', submissions=text_submissions)
 
+def write_and_clear_submissions():
+    while True:
+        time.sleep(60)  # Wait for 1 minute
+        if text_submissions:
+            with open("submissions.txt", "a") as f:
+                for submission in text_submissions:
+                    f.write(submission + "\n")
+            text_submissions.clear()
+
 if __name__ == '__main__':
+    # Start the background thread to write and clear submissions
+    thread = threading.Thread(target=write_and_clear_submissions)
+    thread.daemon = True  # Daemonize thread
+    thread.start()
+    
+    # Start the Flask app
     app.run(debug=True)
 
