@@ -71,7 +71,7 @@ def process_submissions():
             logger.info(f"Prompt sent to OpenAI: {prompt}")
 
 
-	    try:
+	        try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=prompt,
@@ -81,8 +81,8 @@ def process_submissions():
                 api_output = response['choices'][0]['message']['content'].strip()
                 logger.info(f"API output received: {api_output}")
             except Exception as e:
-   	        logger.error(f"Error calling OpenAI API: {e}")
-   	        api_output = "There was an error processing the request."
+   	            logger.error(f"Error calling OpenAI API: {e}")
+   	            api_output = "There was an error processing the request."
             
             # Clear the in-memory submissions list for the next round
             text_submissions.clear()
