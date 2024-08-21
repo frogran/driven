@@ -6,7 +6,7 @@ import time
 import openai
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ api_output = ""
 
 # Get OpenAI API key from environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
+logger.info(f"OpenAI API Key: {openai.api_key[:4]}...")  # Log the first few characters to confirm it's set
 
 @app.route('/')
 def index():
@@ -41,6 +42,7 @@ def admin():
     return render_template('admin.html', submissions=text_submissions)
 
 def process_submissions():
+    logger.info("Started process_submissions thread.")
     global api_output
     while True:
         time.sleep(60)  # Wait for 1 minute
@@ -68,24 +70,20 @@ def process_submissions():
             ]
             logger.info(f"Prompt sent to OpenAI: {prompt}")
 
-            try:
+
+	    try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
                     messages=prompt,
                     max_tokens=100,
                     temperature=0.7
                 )
-
-                # Log the entire response object for detailed inspection
-                logger.info(f"Full response from OpenAI: {response}")
-
-                # Extract and log the specific output text
                 api_output = response['choices'][0]['message']['content'].strip()
                 logger.info(f"API output received: {api_output}")
-
             except Exception as e:
-                logger.error(f"Error calling OpenAI API: {e}")
-
+   	        logger.error(f"Error calling OpenAI API: {e}")
+   	        api_output = "There was an error processing the request."
+            
             # Clear the in-memory submissions list for the next round
             text_submissions.clear()
             logger.info("Cleared text submissions.")
@@ -97,5 +95,5 @@ if __name__ == '__main__':
     thread.start()
     
     # Start the Flask app
-    app.run(debug=True)
-
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
