@@ -56,24 +56,32 @@ def process_submissions():
                 for submission in text_submissions:
                     current_file.write(submission + "\n")
 
-            # Call OpenAI API using the new ChatCompletion method
+            # Prepare the input text for OpenAI
             with open("submissions.txt", "r") as current_file:
                 input_text = current_file.read()
                 logger.info(f"Input text for OpenAI: {input_text}")
 
+            # Define the prompt and log it
+            prompt = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": input_text}
+            ]
+            logger.info(f"Prompt sent to OpenAI: {prompt}")
+
             try:
                 response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": "You are a helpful assistant."},
-                        {"role": "user", "content": input_text}
-                    ],
+                    messages=prompt,
                     max_tokens=100,
                     temperature=0.7
                 )
 
+                # Log the entire response object for detailed inspection
+                logger.info(f"Full response from OpenAI: {response}")
+
+                # Extract and log the specific output text
                 api_output = response['choices'][0]['message']['content'].strip()
-                logger.info(f"Received API output: {api_output}")
+                logger.info(f"API output received: {api_output}")
 
             except Exception as e:
                 logger.error(f"Error calling OpenAI API: {e}")
