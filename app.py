@@ -32,9 +32,38 @@ def crowd():
         if text:
             text_submissions.append(text)
             logger.info(f"Text submissions updated: {text_submissions}")
+
+            # Directly call the OpenAI API here
+            prompt = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": text}
+            ]
+            logger.info(f"Prompt sent to OpenAI: {prompt}")
+
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=prompt,
+                    max_tokens=100,
+                    temperature=0.7
+                )
+
+                # Log the entire response object for detailed inspection
+                logger.info(f"Full response from OpenAI: {response}")
+
+                # Extract and log the specific output text
+                api_output = response['choices'][0]['message']['content'].strip()
+                logger.info(f"API output received: {api_output}")
+
+            except Exception as e:
+                logger.error(f"Error calling OpenAI API: {e}")
+                api_output = "There was an error processing the request."
+
         return redirect(url_for('crowd'))
+
     logger.info(f"Rendering crowd page with API output: {api_output}")
     return render_template('crowd.html', api_output=api_output)
+
 
 @app.route('/admin')
 def admin():
