@@ -32,33 +32,6 @@ def crowd():
         if text:
             text_submissions.append(text)
             logger.info(f"Text submissions updated: {text_submissions}")
-
-            # Directly call the OpenAI API here
-            prompt = [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": text}
-            ]
-            logger.info(f"Prompt sent to OpenAI: {prompt}")
-
-            try:
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=prompt,
-                    max_tokens=100,
-                    temperature=0.7
-                )
-
-                # Log the entire response object for detailed inspection
-                logger.info(f"Full response from OpenAI: {response}")
-
-                # Extract and log the specific output text
-                api_output = response['choices'][0]['message']['content'].strip()
-                logger.info(f"API output received: {api_output}")
-
-            except Exception as e:
-                logger.error(f"Error calling OpenAI API: {e}")
-                api_output = "There was an error processing the request."
-
         return redirect(url_for('crowd'))
 
     logger.info(f"Rendering crowd page with API output: {api_output}")
@@ -75,27 +48,18 @@ def process_submissions():
     global api_output
     while True:
         time.sleep(60)  # Wait for 1 minute
+
         if text_submissions:
             logger.info(f"Processing submissions: {text_submissions}")
-            # Append new submissions to all_submissions.txt
-            with open("all_submissions.txt", "a") as all_file:
-                for submission in text_submissions:
-                    all_file.write(submission + "\n")
 
-            # Write current round submissions to submissions.txt
-            with open("submissions.txt", "w") as current_file:
-                for submission in text_submissions:
-                    current_file.write(submission + "\n")
-
-            # Prepare the input text for OpenAI
-            with open("submissions.txt", "r") as current_file:
-                input_text = current_file.read()
-                logger.info(f"Input text for OpenAI: {input_text}")
+            # Combine all submissions into a single prompt
+            combined_text = "\n".join(text_submissions)
+            logger.info(f"Combined text for OpenAI: {combined_text}")
 
             # Define the prompt and log it
             prompt = [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": input_text}
+                {"role": "system", "content": "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."},
+                {"role": "user", "content": combined_text}
             ]
             logger.info(f"Prompt sent to OpenAI: {prompt}")
 

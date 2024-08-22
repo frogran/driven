@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crowd Page</title>
+    <script>
+        function submitOnEnter(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent the default form submission behavior
+                document.getElementById("crowd-form").submit(); // Submit the form
+            }
+        }
+    </script>
 </head>
 <body style="background-color: white; text-align: center; margin-top: 20%; font-family: Arial, sans-serif;">
     <h1>Submit Your Text</h1>
-    <form action="/crowd" method="post">
-        <textarea name="crowd_text" rows="4" cols="50" placeholder="Type your text here..." style="font-size: 18px;"></textarea><br>
+    <form id="crowd-form" action="/crowd" method="post">
+        <textarea name="crowd_text" rows="4" cols="50" placeholder="Type your text here..." style="font-size: 18px;" onkeypress="submitOnEnter(event)"></textarea><br>
         <button type="submit" style="margin-top: 20px; font-size: 20px;">Send</button>
     </form>
     <br>
@@ -22,4 +30,3 @@
     {% endif %}
 </body>
 </html>
-
