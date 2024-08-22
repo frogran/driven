@@ -44,7 +44,7 @@ def admin():
     return render_template('admin.html', submissions=text_submissions)
 
 def process_submissions():
-    logger.debug("Started process_submissions thread.")
+    logger.info("Started process_submissions thread.")
     global api_output
     while True:
         time.sleep(60)  # Wait for 1 minute
