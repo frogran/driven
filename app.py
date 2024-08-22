@@ -51,15 +51,25 @@ def process_submissions():
 
         if text_submissions:
             logger.info(f"Processing submissions: {text_submissions}")
+            # Append new submissions to all_submissions.txt
+            with open("all_submissions.txt", "a") as all_file:
+                for submission in text_submissions:
+                    all_file.write(submission + "\n")
 
-            # Combine all submissions into a single prompt
-            combined_text = "\n".join(text_submissions)
-            logger.info(f"Combined text for OpenAI: {combined_text}")
+            # Write current round submissions to submissions.txt
+            with open("submissions.txt", "w") as current_file:
+                for submission in text_submissions:
+                    current_file.write(submission + "\n")
+
+            # Prepare the input text for OpenAI
+            with open("submissions.txt", "r") as current_file:
+                input_text = current_file.read()
+                logger.info(f"Input text for OpenAI: {input_text}")
 
             # Define the prompt and log it
             prompt = [
                 {"role": "system", "content": "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."},
-                {"role": "user", "content": combined_text}
+                {"role": "user", "content": input_text}
             ]
             logger.info(f"Prompt sent to OpenAI: {prompt}")
 
