@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 # Store submissions in memory (simple implementation)
 text_submissions = []
-api_output = ""
+api_output = "the empty output"
+i = 0
 
 # Get OpenAI API key from environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -46,6 +47,9 @@ def admin():
 def process_submissions():
     logger.info("Started process_submissions thread.")
     global api_output
+    global i
+    api_output = f"called the api {i}"
+    i += 1
     while True:
         time.sleep(60)  # Wait for 1 minute
 
