@@ -47,33 +47,27 @@ def admin():
 def process_submissions():
     logger.info("Started process_submissions thread.")
     global api_output
-    global i
-    api_output = f"called the api {i}"
-    i += 1
+    i = 0
     while True:
+        logger.info("Thread loop running")
         time.sleep(60)  # Wait for 1 minute
+
+        # For debugging purposes, increment a counter and set the output
+        api_output = f"Called the API {i} times"
+        logger.info(api_output)
+        i += 1
 
         if text_submissions:
             logger.info(f"Processing submissions: {text_submissions}")
-            # Append new submissions to all_submissions.txt
-            with open("all_submissions.txt", "a") as all_file:
-                for submission in text_submissions:
-                    all_file.write(submission + "\n")
 
-            # Write current round submissions to submissions.txt
-            with open("submissions.txt", "w") as current_file:
-                for submission in text_submissions:
-                    current_file.write(submission + "\n")
-
-            # Prepare the input text for OpenAI
-            with open("submissions.txt", "r") as current_file:
-                input_text = current_file.read()
-                logger.info(f"Input text for OpenAI: {input_text}")
+            # Combine all submissions into a single prompt
+            combined_text = "\n".join(text_submissions)
+            logger.info(f"Combined text for OpenAI: {combined_text}")
 
             # Define the prompt and log it
             prompt = [
-                {"role": "system", "content": "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."},
-                {"role": "user", "content": input_text}
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": combined_text}
             ]
             logger.info(f"Prompt sent to OpenAI: {prompt}")
 
