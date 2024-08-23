@@ -55,7 +55,7 @@ def admin():
                 api_output = "There was an error processing the request."
             text_submissions.clear()
 
-    return render_template('admin.html', submissions=all_submissions, api_output=api_output)
+    return render_template('admin.html', submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
 
 @app.route('/dev')
 def dev():
