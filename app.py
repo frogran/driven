@@ -59,7 +59,8 @@ def admin():
 
 @app.route('/dev')
 def dev():
-    return render_template('dev.html', submissions=all_submissions, api_output=api_output)
+    return render_template('dev.html', submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
