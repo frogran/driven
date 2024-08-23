@@ -38,11 +38,13 @@
 
             <h2>Submissions:</h2>
             <ul>
-                {% if loop.index > len(submissions) - len(text_submissions) %}
-                    <li style="color: black;">{{ submission }}</li>
-                {% else %}
-                    <li style="color: blue;">{{ submission }}</li>
-                {% endif %}
+                {% for submission in submissions %}
+                    {% if loop.index > len(submissions) - len(text_submissions) %}
+                        <li style="color: black;">{{ submission }}</li>
+                    {% else %}
+                        <li style="color: blue;">{{ submission }}</li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </div>
     </div>
