@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Page</title>
+    <style>
+        #container {
+            display: flex;
+        }
+        #crowd, #admin {
+            flex: 1;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dev Page</h1>
+    <div id="container">
+        <div id="crowd">
+            <h2>Crowd Page</h2>
+            <form id="crowd-form" action="/crowd" method="post">
+                <textarea name="crowd_text" rows="4" cols="50" placeholder="Type your text here..." onkeypress="submitOnEnter(event)"></textarea><br>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <div id="admin">
+            <h2>Admin Page</h2>
+            <form action="/admin" method="post">
+                <button type="submit" name="send_prompt">Send Prompt to AI</button>
+            </form>
+
+            {% if api_output %}
+            <h2>AI Response:</h2>
+            <p>{{ api_output }}</p>
+            {% endif %}
+
+            <h2>Submissions:</h2>
+            <ul>
+                {% for submission in submissions %}
+                    {% if loop.index > len(submissions) - len(text_submissions) %}
+                        <li style="color: black;">{{ submission }}</li>
+                    {% else %}
+                        <li style="color: blue;">{{ submission }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <br>
+    <a href="/">Back</a>
+</body>
+</html>
