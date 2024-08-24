@@ -38,7 +38,7 @@ def admin():
         if 'send_prompt' in request.form:
             combined_text = "\n".join(text_submissions)
             prompt = [
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."},
                 {"role": "user", "content": combined_text}
             ]
             try:
@@ -57,8 +57,38 @@ def admin():
 
     return render_template('admin.html', submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
 
-@app.route('/dev')
+@app.route('/dev', methods=['GET', 'POST'])
 def dev():
+    global api_output
+    if request.method == 'POST':
+        form_type = request.form.get('form_type')
+        if form_type == 'crowd':
+            text = request.form.get('crowd_text')
+            logger.info(f"Received submission: {text}")
+            if text:
+                text_submissions.append(text)
+                all_submissions.append(text)
+                logger.info(f"Text submissions updated: {text_submissions}")
+        elif form_type == 'admin' and 'send_prompt' in request.form:
+            combined_text = "\n".join(text_submissions)
+            prompt = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": combined_text}
+            ]
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=prompt,
+                    max_tokens=100,
+                    temperature=0.7
+                )
+                api_output = response['choices'][0]['message']['content'].strip()
+                logger.info(f"API output received: {api_output}")
+            except Exception as e:
+                logger.error(f"Error calling OpenAI API: {e}")
+                api_output = "There was an error processing the request."
+            text_submissions.clear()
+
     return render_template('dev.html', submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
 
 

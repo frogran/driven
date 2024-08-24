@@ -17,17 +17,21 @@
 <body>
     <h1>Dev Page</h1>
     <div id="container">
+        <!-- Crowd side -->
         <div id="crowd">
             <h2>Crowd Page</h2>
-            <form id="crowd-form" action="/crowd" method="post">
+            <form id="crowd-form" action="/dev" method="post">
+                <input type="hidden" name="form_type" value="crowd">
                 <textarea name="crowd_text" rows="4" cols="50" placeholder="Type your text here..." onkeypress="submitOnEnter(event)"></textarea><br>
                 <button type="submit">Send</button>
             </form>
         </div>
 
+        <!-- Admin side -->
         <div id="admin">
             <h2>Admin Page</h2>
-            <form action="/admin" method="post">
+            <form action="/dev" method="post">
+                <input type="hidden" name="form_type" value="admin">
                 <button type="submit" name="send_prompt">Send Prompt to AI</button>
             </form>
 
@@ -46,6 +50,6 @@
         </div>
     </div>
     <br>
-    <a href="/">Back</a>
+    <a href="/" style="font-size: 18px;">Back</a>
 </body>
 </html>
