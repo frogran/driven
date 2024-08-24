@@ -39,7 +39,7 @@
             <h2>Submissions:</h2>
             <ul>
                 {% for submission in submissions %}
-                    {% set submission_color = 'black' if loop.index > len(submissions) - len(text_submissions) else 'blue' %}
+                    {% set submission_color = 'black' if loop.index > submissions|length - text_submissions|length else 'blue' %}
                     <li style="color: {{ submission_color }};">{{ submission }}</li>
                 {% endfor %}
             </ul>
