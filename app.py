@@ -9,6 +9,7 @@ app = Flask(__name__)
 text_submissions = []
 all_submissions = []
 api_output = ""
+agent_role = "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."
 
 # Get OpenAI API key from environment variable
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -34,11 +35,12 @@ def crowd():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     global api_output
+    global agent_role
     if request.method == 'POST':
         if 'send_prompt' in request.form:
             combined_text = "\n".join(text_submissions)
             prompt = [
-                {"role": "system", "content": "You are a blind choreographer that's given a 'prompt' to a dancer. The crowd is your eyes and it is giving you inputs about what is happening. Change what you planned to adapt the dance section according to what they see."},
+                {"role": "system", "content": agent_role},
                 {"role": "user", "content": combined_text}
             ]
             try:
@@ -60,6 +62,7 @@ def admin():
 @app.route('/dev', methods=['GET', 'POST'])
 def dev():
     global api_output
+    global agent_role
     if request.method == 'POST':
         form_type = request.form.get('form_type')
         if form_type == 'crowd':
@@ -72,7 +75,7 @@ def dev():
         elif form_type == 'admin' and 'send_prompt' in request.form:
             combined_text = "\n".join(text_submissions)
             prompt = [
-                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "system", "content": agent_role},
                 {"role": "user", "content": combined_text}
             ]
             try:
