@@ -1,9 +1,15 @@
 import os
 import logging
-from flask import Flask, render_template, request, redirect, url_for
 import openai
+from flask import Flask, render_template, request, session, redirect, url_for
+import random
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Necessary for session management
+
+participants = {}
+reader_id = None
 
 # Store submissions
 text_submissions = []
@@ -16,27 +22,51 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
+
+socketio = SocketIO(app, async_mode='eventlet')
+
+@socketio.on('connect')
+def handle_connect():
+    emit('connected', {'message': 'Connected to the server'})
+
+@socketio.on('set_reader')
+def set_reader(data):
+    global reader_id
+    reader_id = data['reader_id']
+    emit('reader_selected', {'reader_id': reader_id}, broadcast=True)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/crowd', methods=['GET', 'POST'])
 def crowd():
+    session_id = session.get('id')
+    if not session_id:
+        session_id = str(random.randint(1000, 9999))
+        session['id'] = session_id
+
     if request.method == 'POST':
         text = request.form.get('crowd_text')
         logger.info(f"Received submission: {text}")
         if text:
             text_submissions.append(text)
             all_submissions.append(text)
+            participants[session_id] = {'submission': text}
             logger.info(f"Text submissions updated: {text_submissions}")
         return redirect(url_for('crowd'))
     return render_template('crowd.html')
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     global api_output
     global agent_role
+    global reader_id
     if request.method == 'POST':
+        reader_id = random.choice(list(participants.keys()))
+        socketio.emit('reader_selected', {'reader_id': reader_id}, broadcast=True)
         if 'send_prompt' in request.form:
             combined_text = "\n".join(text_submissions)
             prompt = [
@@ -57,7 +87,7 @@ def admin():
                 api_output = "There was an error processing the request."
             text_submissions.clear()
 
-    return render_template('admin.html', submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
+    return render_template('admin.html', reader_id=reader_id, submissions=all_submissions, api_output=api_output, text_submissions=text_submissions)
 
 @app.route('/dev', methods=['GET', 'POST'])
 def dev():

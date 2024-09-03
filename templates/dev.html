@@ -52,4 +52,16 @@
     <br>
     <a href="/" style="font-size: 18px;">Back</a>
 </body>
+<!-- Include Socket.IO client library -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+<script>
+const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+socket.on('reader_selected', function(data) {
+    if (data.reader_id == "{{ session.id }}") {
+        alert('You have been selected as the reader!');
+    }
+});
+</script>
+
 </html>
